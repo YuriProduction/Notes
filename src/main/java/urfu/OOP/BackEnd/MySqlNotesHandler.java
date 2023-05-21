@@ -7,7 +7,7 @@ import java.util.List;
 public class MySqlNotesHandler implements IDataBase {
 
     private static final String userName = "root";
-    private static final String password = "admin";
+    private static final String password = "retnirps";
     private static final String connectionURL = "jdbc:mysql://localhost:3306/notes";
     private final List<SQLRecord> allRecords = new ArrayList<>();
 
@@ -29,13 +29,12 @@ public class MySqlNotesHandler implements IDataBase {
             ResultSet resultSet = statement.executeQuery(LocalSQLCommands.SELECT_DATA(java.sql.Date.valueOf(date)));
             while (resultSet.next()) {
                 String record = resultSet.getString(2);
-                int is_done = resultSet.getInt(3);
-                double percent = resultSet.getDouble(4);
-                String time = resultSet.getString(5);
-                System.out.println(date + " " + record + " " + is_done
-                        + " " + percent + " " + time);
+                double percent = resultSet.getDouble(3);
+                String time = resultSet.getString(4);
+                System.out.println(date + " " + record +
+                         " " + percent + " " + time);
                 System.out.println("______________________");
-                allRecords.add(new FullRecord(Date.valueOf(date), record, is_done, percent, time));
+                allRecords.add(new FullRecord(Date.valueOf(date), record, percent, time));
             }
         } catch (java.sql.SQLException exception) {
             System.out.println("Can't connect with database!");
@@ -70,9 +69,8 @@ public class MySqlNotesHandler implements IDataBase {
                 PreparedStatement statement = connection.prepareStatement(LocalSQLCommands.INSERT_DATA(record));
                 statement.setDate(1, ((FullRecord) record).Date());
                 statement.setString(2, ((FullRecord) record).Record());
-                statement.setInt(3, ((FullRecord) record).Is_done());
-                statement.setDouble(4, ((FullRecord) record).Percent());
-                statement.setString(5, ((FullRecord) record).Time());
+                statement.setDouble(3, ((FullRecord) record).Percent());
+                statement.setString(4, ((FullRecord) record).Time());
                 statement.execute();
 
             } catch (java.sql.SQLException exception) {
@@ -102,7 +100,7 @@ public class MySqlNotesHandler implements IDataBase {
     public static void main(String[] args) {
         MySqlNotesHandler handler = new MySqlNotesHandler();
         String date = "2023-05-14";
-        SQLRecord record = new FullRecord(java.sql.Date.valueOf(date), "Сделать уроки", 0, 32.5, "19:38");
+        SQLRecord record = new FullRecord(java.sql.Date.valueOf(date), "Сделать уроки", 32.5, "19:38");
         handler.deleteRecord(record);
         handler.insertRecord(record);
         List<SQLRecord> recordList = handler.getRecords(date);
