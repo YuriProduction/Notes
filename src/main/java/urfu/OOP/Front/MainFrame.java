@@ -1,4 +1,5 @@
 package urfu.OOP.Front;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -16,13 +17,14 @@ import urfu.OOP.BackEnd.MySqlNotesHandler;
 import urfu.OOP.BackEnd.SQLRecord;
 
 
-public class MainFrame extends JFrame{
+public class MainFrame extends JFrame {
     static JFrame jFrame1 = new JFrame("Notes");
     static JPanel tableHead = new JPanel();
     static JDatePicker datePicker = new JDatePicker();
     static JPanel panel = new JPanel();
     static MySqlNotesHandler mySqlNotesHandler = new MySqlNotesHandler();
-    public MainFrame(){
+
+    public MainFrame() {
 
 
         int inset = 50;
@@ -34,13 +36,13 @@ public class MainFrame extends JFrame{
                 screenSize.height - inset * 2);
 
         JButton addNote = new JButton("Добавить заметку");
-        datePicker.setBackground(new Color(255,207,64));
-        addNote.setBackground(new Color(255,207,64));
+        datePicker.setBackground(new Color(255, 207, 64));
+        addNote.setBackground(new Color(255, 207, 64));
         jFrame1.add(datePicker, BorderLayout.NORTH);
         jFrame1.add(addNote, BorderLayout.SOUTH);
 
         tableHead.setLayout(new GridLayout(1, 4));
-        tableHead.setBackground(new Color(255,207,64));
+        tableHead.setBackground(new Color(255, 207, 64));
 
         tableHead.add(addLabelToTableHead("Запись", new Font("Serif", Font.BOLD, 25), Color.BLACK));
 
@@ -51,9 +53,8 @@ public class MainFrame extends JFrame{
         tableHead.add(addLabelToTableHead("Удалить", new Font("Serif", Font.BOLD, 25), Color.BLACK));
 
 
-
         JButton nextDate = new JButton(">");
-        nextDate.setBackground(new Color(255,207,64));
+        nextDate.setBackground(new Color(255, 207, 64));
         nextDate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -62,7 +63,7 @@ public class MainFrame extends JFrame{
             }
         });
         JButton prevDate = new JButton("<");
-        prevDate.setBackground(new Color(255,207,64));
+        prevDate.setBackground(new Color(255, 207, 64));
         prevDate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -87,11 +88,9 @@ public class MainFrame extends JFrame{
             }
         });
 
-        jFrame1.addWindowListener(new WindowAdapter()
-        {
+        jFrame1.addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent e)
-            {
+            public void windowClosing(WindowEvent e) {
 
                 try {
                     exit();
@@ -104,6 +103,7 @@ public class MainFrame extends JFrame{
 
 
     }
+
     private static void exit() throws IOException {
         Object[] options = {"Да",
                 "Нет"};
@@ -114,25 +114,27 @@ public class MainFrame extends JFrame{
         }
     }
 
-    public static JLabel addLabelToTableHead(String textOfHead, Font font, Color borderColor){
+    public static JLabel addLabelToTableHead(String textOfHead, Font font, Color borderColor) {
         JLabel newLabel = new JLabel(textOfHead);
         newLabel.setFont(font);
         newLabel.setBorder(BorderFactory.createLineBorder(borderColor));
         return newLabel;
     }
-    public static java.sql.Date getDate(){
+
+    public static java.sql.Date getDate() {
         java.sql.Date sqlPackageDate
-                = new java.sql.Date(datePicker.getModel().getYear()-1900, datePicker.getModel().getMonth(), datePicker.getModel().getDay());
+                = new java.sql.Date(datePicker.getModel().getYear() - 1900, datePicker.getModel().getMonth(), datePicker.getModel().getDay());
         return sqlPackageDate;
     }
-    public static void newLabelNoteToPanel(JPanel panel){
+
+    public static void newLabelNoteToPanel(JPanel panel) {
 
         Note note;
         String name = "";
         int progress = 0;
         MyDialog myDialog = new MyDialog(jFrame1, "Напишите заметку:", "На сколько процентов выполнено?");
         myDialog.setVisible(true);
-        if(!myDialog.getHaveException()&& !Objects.equals(myDialog.getInputString(), "")) {
+        if (!myDialog.getHaveException() && !Objects.equals(myDialog.getInputString(), "")) {
             name = myDialog.getInputString();
             progress = myDialog.getInputInt();
             String time = "16:10";
@@ -144,7 +146,8 @@ public class MainFrame extends JFrame{
 
         }
     }
-    public static void makeNoteVisible(JPanel panel, Note note){
+
+    public static void makeNoteVisible(JPanel panel, Note note) {
         JPanel tableString = new JPanel();
         tableString.setLayout(new GridLayout(1, 10));
         tableString.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -175,11 +178,20 @@ public class MainFrame extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 MyDialog myDialog = new MyDialog(jFrame1, "Исправить заметку:", "На сколько процентов выполнено?");
                 myDialog.setVisible(true);
+                System.out.println("Сейчас будем изменять запись!");
+                String oldRecord = textField.getText();
+                System.out.println("Старая запись: " + oldRecord);
                 if (!myDialog.getHaveException() && !Objects.equals(myDialog.getInputString(), "")) {
                     textField.setText(myDialog.getInputString());
                     progressBar.setValue(myDialog.getInputInt());
                 }
+                String newRecord = textField.getText();
+                System.out.println("Новая запись: " + newRecord);
+
+                System.out.println("Изменили запись!");
+
                 //Update sql таблицы сюда
+                updateNoteByDateAndRecord(oldRecord, newRecord);
                 updateNotesByDay();
             }
         });
@@ -194,21 +206,27 @@ public class MainFrame extends JFrame{
         tableString.add(buttonDelete);
         panel.add(tableString);
     }
+
+    public static void updateNoteByDateAndRecord(String oldRecord, String newRecord) {
+        java.sql.Date today = getDate();
+        mySqlNotesHandler.updateRecord(new AllNotesTableRecord(today, oldRecord, 0, null), newRecord);
+    }
+
     public static void updateNotesByDay() {
-        if (panel!=null)
+        if (panel != null)
             panel.removeAll();
         jFrame1.repaint();
         jFrame1.revalidate();
-
-        panel.setBackground(new Color(255,219,139));
+        panel.setBackground(new Color(255, 219, 139));
         panel.setLayout(new GridLayout(10, 1));
         panel.add(tableHead);
         java.sql.Date today = getDate();
         System.out.println(today);
+
         List<SQLRecord> list = mySqlNotesHandler.getRecords(today.toString());
-        for (SQLRecord record: list){
+        for (SQLRecord record : list) {
             AllNotesTableRecord recTmp = ((AllNotesTableRecord) record);
-            makeNoteVisible(panel, new Note(recTmp.Record(), (int) recTmp.Percent(), getDate(), recTmp.Time() ));
+            makeNoteVisible(panel, new Note(recTmp.Record(), (int) recTmp.Percent(), getDate(), recTmp.Time()));
         }
         panel.revalidate();
         panel.repaint();

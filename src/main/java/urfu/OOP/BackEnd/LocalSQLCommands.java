@@ -9,13 +9,16 @@ public class LocalSQLCommands {
         return "DELETE FROM allNotes WHERE date_of_record = "
                 + "?" + " AND " + "Time = " + "?" + " AND " + "record = " + "?";
     }
+
     public static String UPDATE_DATA(SQLRecord record) {
         //по-хорошему так везде
         if (record instanceof AllNotesTableRecord) {
-            return "";
+            return "UPDATE " + "allNotes" + " SET " + "record" + " = ? " +
+                    "WHERE record = ? and date_of_record = ?";
         }
         return null;
-        }
+    }
+
     public static String INSERT_DATA(SQLRecord record) {
         //по-хорошему так везде
         if (record instanceof AllNotesTableRecord) {
@@ -24,4 +27,5 @@ public class LocalSQLCommands {
         }
         return null;
     }
+
 }

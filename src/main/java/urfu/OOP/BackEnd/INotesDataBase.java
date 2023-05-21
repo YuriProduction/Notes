@@ -9,4 +9,6 @@ public interface INotesDataBase {
     public void insertRecord(SQLRecord record);
 
     public void deleteRecord(SQLRecord record);
+
+    public void updateRecord(SQLRecord record, String updatableRecord);
 }

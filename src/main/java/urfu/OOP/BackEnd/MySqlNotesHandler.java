@@ -7,7 +7,7 @@ import java.util.List;
 public class MySqlNotesHandler implements INotesDataBase {
 
     private static final String userName = "root";
-    private static final String password = "retnirps";
+    private static final String password = "admin";
     private static final String connectionURL = "jdbc:mysql://localhost:3306/notes";
     private List<SQLRecord> allRecords;
 
@@ -31,8 +31,7 @@ public class MySqlNotesHandler implements INotesDataBase {
                 String record = resultSet.getString(2);
                 double percent = resultSet.getDouble(3);
                 String time = resultSet.getString(4);
-                System.out.println(date + " " + record + " "
-                        + " " + percent + " " + time);
+                System.out.println(date + " " + record + " " + " " + percent + " " + time);
                 System.out.println("______________________");
 
                 allRecords.add(new AllNotesTableRecord(Date.valueOf(date), record, percent, time));
@@ -75,7 +74,7 @@ public class MySqlNotesHandler implements INotesDataBase {
             }
         }
     }
-//Добавить sql update и обновление по таймеру интерфейса
+
     @Override
     public void deleteRecord(SQLRecord record) {
         if (record instanceof AllNotesTableRecord) {
@@ -85,6 +84,23 @@ public class MySqlNotesHandler implements INotesDataBase {
                 statement.setDate(1, ((AllNotesTableRecord) record).Date());
                 statement.setString(2, ((AllNotesTableRecord) record).Time());
                 statement.setString(3, ((AllNotesTableRecord) record).Record());
+                statement.execute();
+            } catch (java.sql.SQLException exception) {
+                System.out.println(exception.getMessage());
+                System.exit(-1);
+            }
+        }
+    }
+
+    @Override
+    public void updateRecord(SQLRecord record, String updatableRecord) {
+        if (record instanceof AllNotesTableRecord) {
+            try (Connection connection = DriverManager.getConnection(connectionURL, userName, password)) {
+                System.out.println("We're connected");
+                PreparedStatement statement = connection.prepareStatement(LocalSQLCommands.UPDATE_DATA(record));
+                statement.setString(1, updatableRecord);
+                statement.setString(2, ((AllNotesTableRecord) record).Record());
+                statement.setDate(3, ((AllNotesTableRecord) record).Date());
                 statement.execute();
             } catch (java.sql.SQLException exception) {
                 System.out.println(exception.getMessage());
