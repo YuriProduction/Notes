@@ -1,4 +1,5 @@
 package urfu.OOP.Front;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -9,7 +10,14 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jdatepicker.*;
+import urfu.OOP.BackEnd.AllNotesTableRecord;
+import urfu.OOP.BackEnd.MySqlNotesHandler;
+import urfu.OOP.BackEnd.SQLRecord;
 
 
 public class Interface {
@@ -22,7 +30,7 @@ public class Interface {
             public void actionPerformed(ActionEvent e) {
                 System.out.println(i.getModel().getMonth());
                 java.sql.Date sqlPackageDate
-                        = new java.sql.Date(i.getModel().getYear()-1900, i.getModel().getMonth(), i.getModel().getDay());
+                        = new java.sql.Date(i.getModel().getYear() - 1900, i.getModel().getMonth(), i.getModel().getDay());
                 System.out.println(sqlPackageDate);
             }
         });
@@ -36,7 +44,7 @@ public class Interface {
 
         JButton b = new JButton("Добавить заметку");
         JPanel panel = new JPanel();
-        panel.setBackground(new Color(255,219,139));
+        panel.setBackground(new Color(255, 219, 139));
         JPanel tableHead = new JPanel();
         tableHead.setLayout(new GridLayout(1, 4));
 
@@ -44,7 +52,7 @@ public class Interface {
         record.setFont(new Font("Serif", Font.BOLD, 25));
         record.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         tableHead.add(record);
-        tableHead.setBackground(new Color(255,207,64));
+        tableHead.setBackground(new Color(255, 207, 64));
 
         JLabel progress = new JLabel("Прогресс");
         progress.setFont(new Font("Serif", Font.BOLD, 25));
@@ -63,12 +71,12 @@ public class Interface {
 
         panel.setLayout(new GridLayout(10, 1));
 
-        i.setBackground(new Color(255,207,64));
-        b.setBackground(new Color(255,207,64));
+        i.setBackground(new Color(255, 207, 64));
+        b.setBackground(new Color(255, 207, 64));
         jFrame1.add(i, BorderLayout.NORTH);
         jFrame1.add(b, BorderLayout.SOUTH);
         JButton nextDate = new JButton(">");
-        nextDate.setBackground(new Color(255,207,64));
+        nextDate.setBackground(new Color(255, 207, 64));
         nextDate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -76,7 +84,7 @@ public class Interface {
             }
         });
         JButton prevDate = new JButton("<");
-        prevDate.setBackground(new Color(255,207,64));
+        prevDate.setBackground(new Color(255, 207, 64));
         prevDate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -96,18 +104,10 @@ public class Interface {
                 jFrame1.revalidate();
             }
         });
-//        date.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                System.out.println("date change");
-//            }
-//        });
 
-
-        jFrame1.addWindowListener(new WindowAdapter()
-        {
+        jFrame1.addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent e)
-            {
+            public void windowClosing(WindowEvent e) {
 
                 try {
                     exit();
@@ -119,38 +119,19 @@ public class Interface {
         jFrame1.setVisible(true);
 
     }
+
     private static void exit() throws IOException {
         Object[] options = {"Да",
                 "Нет"};
         int s = JOptionPane.showOptionDialog(null, "Вы уверены что хотите выйти?", "Уведомление", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
         if (s == 0) {
             System.out.println("Closed");
-//            File file = new File(System.getenv("USERPROFILE") + "\\setting.txt");
-//            if (file.createNewFile()) {
-//                System.out.println("File is created!");
-//            } else {
-//                System.out.println("File already exists.");
-//            }
-//            FileWriter writer = new FileWriter(file);
-//            writer.write("1\n");
-//            writer.write("Test data:\n");
-//            JInternalFrame[] arr = desktopPane.getAllFrames();
-//            for (JInternalFrame var : arr) {
-//                writer.write("\"" + var.getTitle() + "\" ");
-//                if (var.isIcon())
-//                    writer.write("\"Не Свёрнуто\" ");
-//                else
-//                    writer.write("\"Свёрнуто\" ");
-//                Rectangle a = var.getBounds();
-//                writer.write("x=" + a.x + " y=" + a.y + " width=" + a.width + " ");
-//                writer.write("height=" + a.height + "\n");
-//            }
-//            writer.close();
             System.exit(0);
         }
     }
+
     //Добавить проценты выполнения , добавить удаление по 100% , смену дней, фиксация дня из базы, стрелочки побокам
-    public static void newLabelToPanel(JPanel panel, JFrame jFrame1){
+    public static void newLabelToPanel(JPanel panel, JFrame jFrame1) {
         JPanel tableString = new JPanel();
         tableString.setLayout(new GridLayout(1, 10));
         tableString.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -160,25 +141,29 @@ public class Interface {
         JTextField textField = new JTextField();
         textField.setText(name);
         textField.setEditable(false);
-        textField.setBackground(new Color(244,169,0));
+        textField.setBackground(new Color(244, 169, 0));
         textField.setFont(new Font("Serif", Font.BOLD, 20));
         JScrollPane jScrollPane = new JScrollPane(textField);
         jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         tableString.add(jScrollPane);
+        MySqlNotesHandler mySqlNotesHandler = new MySqlNotesHandler();
+        mySqlNotesHandler.insertRecord(new AllNotesTableRecord(new java.sql.Date(System.currentTimeMillis()),
+                name, 30.0, "16:20"));
 
         JProgressBar progressBar = new JProgressBar();
-        progressBar.setBackground(new Color(244,169,0));
+        progressBar.setBackground(new Color(244, 169, 0));
         tableString.add(progressBar);
 
+
         JButton buttonRewrite = new JButton("Rewrite");
-        buttonRewrite.setBackground(new Color(244,169,0));
+        buttonRewrite.setBackground(new Color(244, 169, 0));
         buttonRewrite.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 MyDialog myDialog = new MyDialog(jFrame1, "Исправить заметку:", "На сколько процентов выполнено?");
                 myDialog.setVisible(true);
-                if(!myDialog.getHaveException()){
+                if (!myDialog.getHaveException()) {
                     textField.setText(myDialog.getInputString());
                     progressBar.setValue(myDialog.getInputInt());
                 }
@@ -189,7 +174,7 @@ public class Interface {
         tableString.add(buttonRewrite);
 
         JButton buttonDelete = new JButton("Delete");
-        buttonDelete.setBackground(new Color(244,169,0));
+        buttonDelete.setBackground(new Color(244, 169, 0));
         buttonDelete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

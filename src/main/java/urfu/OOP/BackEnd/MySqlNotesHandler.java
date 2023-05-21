@@ -29,13 +29,12 @@ public class MySqlNotesHandler implements INotesDataBase {
             ResultSet resultSet = statement.executeQuery(LocalSQLCommands.SELECT_DATA(java.sql.Date.valueOf(date)));
             while (resultSet.next()) {
                 String record = resultSet.getString(2);
-                int is_done = resultSet.getInt(3);
-                double percent = resultSet.getDouble(4);
-                String time = resultSet.getString(5);
-                System.out.println(date + " " + record + " " + is_done
+                double percent = resultSet.getDouble(3);
+                String time = resultSet.getString(4);
+                System.out.println(date + " " + record + " "
                         + " " + percent + " " + time);
                 System.out.println("______________________");
-                allRecords.add(new AllNotesTableRecord(Date.valueOf(date), record, is_done, percent, time));
+                allRecords.add(new AllNotesTableRecord(Date.valueOf(date), record, percent, time));
             }
         } catch (java.sql.SQLException exception) {
             System.out.println("Can't connect with database!");
@@ -65,9 +64,8 @@ public class MySqlNotesHandler implements INotesDataBase {
                 PreparedStatement statement = connection.prepareStatement(LocalSQLCommands.INSERT_DATA(record));
                 statement.setDate(1, ((AllNotesTableRecord) record).Date());
                 statement.setString(2, ((AllNotesTableRecord) record).Record());
-                statement.setInt(3, ((AllNotesTableRecord) record).Is_done());
-                statement.setDouble(4, ((AllNotesTableRecord) record).Percent());
-                statement.setString(5, ((AllNotesTableRecord) record).Time());
+                statement.setDouble(3, ((AllNotesTableRecord) record).Percent());
+                statement.setString(4, ((AllNotesTableRecord) record).Time());
                 statement.execute();
 
             } catch (java.sql.SQLException exception) {
@@ -97,7 +95,7 @@ public class MySqlNotesHandler implements INotesDataBase {
     public static void main(String[] args) {
         MySqlNotesHandler handler = new MySqlNotesHandler();
         String date = "2023-05-14";
-        SQLRecord record = new AllNotesTableRecord(java.sql.Date.valueOf(date), "Сделать уроки", 0, 32.5, "19:38");
+        SQLRecord record = new AllNotesTableRecord(java.sql.Date.valueOf(date), "Сделать уроки", 32.5, "19:38");
         handler.deleteRecord(record);
         handler.insertRecord(record);
         List<SQLRecord> recordList = handler.getRecords(date);
@@ -105,3 +103,5 @@ public class MySqlNotesHandler implements INotesDataBase {
         System.out.println(a);
     }
 }
+
+
