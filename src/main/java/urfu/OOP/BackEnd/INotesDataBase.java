@@ -1,10 +1,8 @@
 package urfu.OOP.BackEnd;
 
-import java.sql.SQLException;
 import java.util.List;
 
-public interface IDataBase {
-    public List<SQLRecord> getRecords();
+public interface INotesDataBase {
 
     List<SQLRecord> getRecords(String date);
 

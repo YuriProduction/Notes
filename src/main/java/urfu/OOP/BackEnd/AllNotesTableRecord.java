@@ -2,7 +2,7 @@ package urfu.OOP.BackEnd;
 
 import java.sql.Date;
 
-public class FullRecord extends SQLRecord {
+public class AllNotesTableRecord extends SQLRecord {
     private final java.sql.Date date;
     private final String record;
 
@@ -26,8 +26,8 @@ public class FullRecord extends SQLRecord {
         return time;
     }
 
-    public FullRecord(java.sql.Date date, String record,
-                      double percent, String time) {
+    public AllNotesTableRecord(java.sql.Date date, String record,
+                               double percent, String time) {
         this.date = date;
         this.record = record;
         this.percent = percent;

@@ -7,20 +7,24 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 import org.jdatepicker.*;
+import urfu.OOP.BackEnd.AllNotesTableRecord;
+import urfu.OOP.BackEnd.MySqlNotesHandler;
+import urfu.OOP.BackEnd.SQLRecord;
 
 
 public class MainFrame extends JFrame{
-    JFrame jFrame1 = new JFrame("Notes");
+    static JFrame jFrame1 = new JFrame("Notes");
+    static JPanel tableHead = new JPanel();
+    static JDatePicker datePicker = new JDatePicker();
+    static JPanel panel = new JPanel();
+    static MySqlNotesHandler mySqlNotesHandler = new MySqlNotesHandler();
     public MainFrame(){
-        JDatePicker datePicker = new JDatePicker();
-        datePicker.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                System.out.println(getDate(datePicker));
-            }
-        });
+
+
         int inset = 50;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -34,9 +38,7 @@ public class MainFrame extends JFrame{
         addNote.setBackground(new Color(255,207,64));
         jFrame1.add(datePicker, BorderLayout.NORTH);
         jFrame1.add(addNote, BorderLayout.SOUTH);
-        JPanel panel = new JPanel();
-        panel.setBackground(new Color(255,219,139));
-        JPanel tableHead = new JPanel();
+
         tableHead.setLayout(new GridLayout(1, 4));
         tableHead.setBackground(new Color(255,207,64));
 
@@ -48,7 +50,6 @@ public class MainFrame extends JFrame{
 
         tableHead.add(addLabelToTableHead("Удалить", new Font("Serif", Font.BOLD, 25), Color.BLACK));
 
-        panel.setLayout(new GridLayout(10, 1));
 
 
         JButton nextDate = new JButton(">");
@@ -57,6 +58,7 @@ public class MainFrame extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 datePicker.getModel().addDay(1);
+                updateNotesByDay();
             }
         });
         JButton prevDate = new JButton("<");
@@ -65,22 +67,25 @@ public class MainFrame extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 datePicker.getModel().addDay(-1);
+                updateNotesByDay();
             }
         });
         jFrame1.add(nextDate, BorderLayout.EAST);
         jFrame1.add(prevDate, BorderLayout.WEST);
-        panel.add(tableHead);
-        jFrame1.add(panel);
+        updateNotesByDay();
         jFrame1.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
         addNote.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
-                newLabelNoteToPanel(panel, jFrame1);
+                newLabelNoteToPanel(panel);
                 jFrame1.revalidate();
             }
         });
-
+        datePicker.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                updateNotesByDay();
+            }
+        });
 
         jFrame1.addWindowListener(new WindowAdapter()
         {
@@ -96,6 +101,7 @@ public class MainFrame extends JFrame{
             }
         });
         jFrame1.setVisible(true);
+
 
     }
     private static void exit() throws IOException {
@@ -114,71 +120,100 @@ public class MainFrame extends JFrame{
         newLabel.setBorder(BorderFactory.createLineBorder(borderColor));
         return newLabel;
     }
-    public static java.sql.Date getDate(DatePicker datePicker){
+    public static java.sql.Date getDate(){
         java.sql.Date sqlPackageDate
                 = new java.sql.Date(datePicker.getModel().getYear()-1900, datePicker.getModel().getMonth(), datePicker.getModel().getDay());
         return sqlPackageDate;
     }
-    public static void newLabelNoteToPanel(JPanel panel, JFrame jFrame1){
-        JPanel tableString = new JPanel();
-        tableString.setLayout(new GridLayout(1, 10));
-        tableString.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+    public static void newLabelNoteToPanel(JPanel panel){
 
+        Note note;
         String name = "";
         int progress = 0;
         MyDialog myDialog = new MyDialog(jFrame1, "Напишите заметку:", "На сколько процентов выполнено?");
         myDialog.setVisible(true);
-        Boolean haveException = myDialog.getHaveException();
-        if(!myDialog.getHaveException()&& !Objects.equals(myDialog.getInputString(), "")){
+        if(!myDialog.getHaveException()&& !Objects.equals(myDialog.getInputString(), "")) {
             name = myDialog.getInputString();
             progress = myDialog.getInputInt();
+            String time = "16:10";
+            note = new Note(name, progress, getDate(), time);
+            mySqlNotesHandler.insertRecord(new AllNotesTableRecord(getDate(),
+                    name, progress, "16:21"));
+            makeNoteVisible(panel, note);
+
+
         }
+    }
+    public static void makeNoteVisible(JPanel panel, Note note){
+        JPanel tableString = new JPanel();
+        tableString.setLayout(new GridLayout(1, 10));
+        tableString.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        tableString.setLayout(new GridLayout(1, 10));
+        tableString.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         JTextField textField = new JTextField();
-        textField.setText(name);
+        textField.setText(note.getName());
         textField.setEditable(false);
-        textField.setBackground(new Color(244,169,0));
+        textField.setBackground(new Color(244, 169, 0));
         textField.setFont(new Font("Serif", Font.BOLD, 20));
         JScrollPane jScrollPane = new JScrollPane(textField);
         jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         tableString.add(jScrollPane);
-
+        mySqlNotesHandler.readRecords(getDate().toString());
         JProgressBar progressBar = new JProgressBar();
-        progressBar.setValue(progress);
-        progressBar.setBackground(new Color(244,169,0));
+        progressBar.setValue(note.getProgress());
+        progressBar.setBackground(new Color(244, 169, 0));
         tableString.add(progressBar);
 
         JButton buttonRewrite = new JButton("Rewrite");
-        buttonRewrite.setBackground(new Color(244,169,0));
+        buttonRewrite.setBackground(new Color(244, 169, 0));
+
+        JButton buttonDelete = new JButton("Delete");
+        buttonDelete.setBackground(new Color(244, 169, 0));
         buttonRewrite.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 MyDialog myDialog = new MyDialog(jFrame1, "Исправить заметку:", "На сколько процентов выполнено?");
                 myDialog.setVisible(true);
-                if(!myDialog.getHaveException()&& !Objects.equals(myDialog.getInputString(), "")){
+                if (!myDialog.getHaveException() && !Objects.equals(myDialog.getInputString(), "")) {
                     textField.setText(myDialog.getInputString());
                     progressBar.setValue(myDialog.getInputInt());
                 }
-                panel.revalidate();
-                panel.repaint();
+                //Update sql таблицы сюда
+                updateNotesByDay();
             }
         });
         tableString.add(buttonRewrite);
-
-        JButton buttonDelete = new JButton("Delete");
-        buttonDelete.setBackground(new Color(244,169,0));
         buttonDelete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                panel.remove(tableString);
-                panel.revalidate();
-                panel.repaint();
+                mySqlNotesHandler.deleteRecord(new AllNotesTableRecord(getDate(), note.getName(), note.getProgress(), note.getTime()));
+                updateNotesByDay();
             }
         });
         tableString.add(buttonDelete);
-
-        if (!haveException&& !Objects.equals(myDialog.getInputString(), ""))
-            panel.add(tableString);
+        panel.add(tableString);
     }
+    public static void updateNotesByDay() {
+        if (panel!=null)
+            panel.removeAll();
+        jFrame1.repaint();
+        jFrame1.revalidate();
 
+        panel.setBackground(new Color(255,219,139));
+        panel.setLayout(new GridLayout(10, 1));
+        panel.add(tableHead);
+        java.sql.Date today = getDate();
+        System.out.println(today);
+        List<SQLRecord> list = mySqlNotesHandler.getRecords(today.toString());
+        for (SQLRecord record: list){
+            AllNotesTableRecord recTmp = ((AllNotesTableRecord) record);
+            makeNoteVisible(panel, new Note(recTmp.Record(), (int) recTmp.Percent(), getDate(), recTmp.Time() ));
+        }
+        panel.revalidate();
+        panel.repaint();
+        jFrame1.add(panel);
+        jFrame1.revalidate();
+        jFrame1.repaint();
+    }
 }

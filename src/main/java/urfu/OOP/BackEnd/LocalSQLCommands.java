@@ -7,12 +7,18 @@ public class LocalSQLCommands {
 
     public static String DELETE_DATA() {
         return "DELETE FROM allNotes WHERE date_of_record = "
-                + "?" + " AND " + "Time = " + "?";
+                + "?" + " AND " + "Time = " + "?" + " AND " + "record = " + "?";
     }
-
+    public static String UPDATE_DATA(SQLRecord record) {
+        //по-хорошему так везде
+        if (record instanceof AllNotesTableRecord) {
+            return "";
+        }
+        return null;
+        }
     public static String INSERT_DATA(SQLRecord record) {
         //по-хорошему так везде
-        if (record instanceof FullRecord) {
+        if (record instanceof AllNotesTableRecord) {
             return "insert into allNotes (date_of_record, record, percent, Time) values "
                     + "(?,?,?,?)";
         }
