@@ -12,7 +12,7 @@ public class LocalSQLCommands {
 
     public static String INSERT_DATA(SQLRecord record) {
         //по-хорошему так везде
-        if (record instanceof FullRecord) {
+        if (record instanceof AllNotesTableRecord) {
             return "insert into allNotes (date_of_record, record, is_done, percent, Time) values "
                     + "(?,?,?,?,?)";
         }
