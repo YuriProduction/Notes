@@ -13,7 +13,8 @@ public class LocalSQLCommands {
     public static String UPDATE_DATA(SQLRecord record) {
         //по-хорошему так везде
         if (record instanceof AllNotesTableRecord) {
-            return "UPDATE " + "allNotes" + " SET " + "record" + " = ? " +
+            return "UPDATE " + "allNotes" + " SET " + "record" + " = ?, " +
+                    "percent = ? " +
                     "WHERE record = ? and date_of_record = ?";
         }
         return null;

@@ -181,17 +181,20 @@ public class MainFrame extends JFrame {
                 System.out.println("Сейчас будем изменять запись!");
                 String oldRecord = textField.getText();
                 System.out.println("Старая запись: " + oldRecord);
+                int oldPercents = progressBar.getValue();
+
                 if (!myDialog.getHaveException() && !Objects.equals(myDialog.getInputString(), "")) {
                     textField.setText(myDialog.getInputString());
                     progressBar.setValue(myDialog.getInputInt());
                 }
                 String newRecord = textField.getText();
+                int newPercents = progressBar.getValue();
                 System.out.println("Новая запись: " + newRecord);
-
+                System.out.println("Новые проценты: " + newPercents);
                 System.out.println("Изменили запись!");
 
                 //Update sql таблицы сюда
-                updateNoteByDateAndRecord(oldRecord, newRecord);
+                updateNoteByDateAndRecord(oldRecord, newRecord,oldPercents,newPercents);
                 updateNotesByDay();
             }
         });
@@ -207,9 +210,9 @@ public class MainFrame extends JFrame {
         panel.add(tableString);
     }
 
-    public static void updateNoteByDateAndRecord(String oldRecord, String newRecord) {
+    public static void updateNoteByDateAndRecord(String oldRecord, String newRecord,int oldPercents,int newPercents) {
         java.sql.Date today = getDate();
-        mySqlNotesHandler.updateRecord(new AllNotesTableRecord(today, oldRecord, 0, null), newRecord);
+        mySqlNotesHandler.updateRecord(new AllNotesTableRecord(today, oldRecord, oldPercents, null), newRecord,newPercents);
     }
 
     public static void updateNotesByDay() {

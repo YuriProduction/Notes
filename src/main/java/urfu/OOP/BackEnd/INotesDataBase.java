@@ -10,5 +10,5 @@ public interface INotesDataBase {
 
     public void deleteRecord(SQLRecord record);
 
-    public void updateRecord(SQLRecord record, String updatableRecord);
+    public void updateRecord(SQLRecord record, String updatableRecord, int newPercents);
 }

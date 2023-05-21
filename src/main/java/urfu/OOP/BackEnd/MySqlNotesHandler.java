@@ -93,14 +93,15 @@ public class MySqlNotesHandler implements INotesDataBase {
     }
 
     @Override
-    public void updateRecord(SQLRecord record, String updatableRecord) {
+    public void updateRecord(SQLRecord record, String updatableRecord, int newPercents) {
         if (record instanceof AllNotesTableRecord) {
             try (Connection connection = DriverManager.getConnection(connectionURL, userName, password)) {
                 System.out.println("We're connected");
                 PreparedStatement statement = connection.prepareStatement(LocalSQLCommands.UPDATE_DATA(record));
                 statement.setString(1, updatableRecord);
-                statement.setString(2, ((AllNotesTableRecord) record).Record());
-                statement.setDate(3, ((AllNotesTableRecord) record).Date());
+                statement.setInt(2, newPercents);
+                statement.setString(3, ((AllNotesTableRecord) record).Record());
+                statement.setDate(4, ((AllNotesTableRecord) record).Date());
                 statement.execute();
             } catch (java.sql.SQLException exception) {
                 System.out.println(exception.getMessage());
