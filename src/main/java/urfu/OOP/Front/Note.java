@@ -7,7 +7,8 @@ public class Note {
     private int progress;
     private java.sql.Date date;
     private String time;
-    Note(String name, int progress, java.sql.Date date, String time){
+
+    Note(String name, int progress, java.sql.Date date, String time) {
         this.name = name;
         this.progress = progress;
         this.time = time;

@@ -1,28 +1,19 @@
 package urfu.OOP.BackEnd;
 
+import urfu.OOP.BackEnd.Patterns.ConnectionPool;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MySqlNotesHandler implements INotesDataBase {
 
-    private static final String userName = "root";
-    private static final String password = "admin";
-    private static final String connectionURL = "jdbc:mysql://localhost:3306/notes";
+    private final ConnectionPool connectionPool = new ConnectionPool();
     private List<SQLRecord> allRecords;
 
-    private void connectToDataBase() throws NullPointerException {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException exception) {
-            System.out.println("Class not found exception!");
-            System.exit(-1);
-        }
-    }
 
     public void readRecords(String date) {
-        this.connectToDataBase();
-        try (Connection connection = DriverManager.getConnection(connectionURL, userName, password)) {
+        try (Connection connection = connectionPool.getConnection()) {
             System.out.println("We're connected");
             Statement statement = connection.createStatement();
             allRecords = new ArrayList<>();
@@ -49,7 +40,6 @@ public class MySqlNotesHandler implements INotesDataBase {
 
     }
 
-
     @Override
     public List<SQLRecord> getRecords(String date) {
         this.readRecords(date);
@@ -59,7 +49,7 @@ public class MySqlNotesHandler implements INotesDataBase {
     @Override
     public void insertRecord(SQLRecord record) {
         if (record instanceof AllNotesTableRecord) {
-            try (Connection connection = DriverManager.getConnection(connectionURL, userName, password)) {
+            try (Connection connection = connectionPool.getConnection()) {
                 System.out.println("We're connected");
                 PreparedStatement statement = connection.prepareStatement(LocalSQLCommands.INSERT_DATA(record));
                 statement.setDate(1, ((AllNotesTableRecord) record).Date());
@@ -78,7 +68,7 @@ public class MySqlNotesHandler implements INotesDataBase {
     @Override
     public void deleteRecord(SQLRecord record) {
         if (record instanceof AllNotesTableRecord) {
-            try (Connection connection = DriverManager.getConnection(connectionURL, userName, password)) {
+            try (Connection connection = connectionPool.getConnection()) {
                 System.out.println("We're connected");
                 PreparedStatement statement = connection.prepareStatement(LocalSQLCommands.DELETE_DATA());
                 statement.setDate(1, ((AllNotesTableRecord) record).Date());
@@ -95,7 +85,7 @@ public class MySqlNotesHandler implements INotesDataBase {
     @Override
     public void updateRecord(SQLRecord record, String updatableRecord, int newPercents) {
         if (record instanceof AllNotesTableRecord) {
-            try (Connection connection = DriverManager.getConnection(connectionURL, userName, password)) {
+            try (Connection connection = connectionPool.getConnection()) {
                 System.out.println("We're connected");
                 PreparedStatement statement = connection.prepareStatement(LocalSQLCommands.UPDATE_DATA(record));
                 statement.setString(1, updatableRecord);

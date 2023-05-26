@@ -194,7 +194,7 @@ public class MainFrame extends JFrame {
                 System.out.println("Изменили запись!");
 
                 //Update sql таблицы сюда
-                updateNoteByDateAndRecord(oldRecord, newRecord,oldPercents,newPercents);
+                updateNoteByDateAndRecord(oldRecord, newRecord, oldPercents, newPercents);
                 updateNotesByDay();
             }
         });
@@ -210,9 +210,9 @@ public class MainFrame extends JFrame {
         panel.add(tableString);
     }
 
-    public static void updateNoteByDateAndRecord(String oldRecord, String newRecord,int oldPercents,int newPercents) {
+    public static void updateNoteByDateAndRecord(String oldRecord, String newRecord, int oldPercents, int newPercents) {
         java.sql.Date today = getDate();
-        mySqlNotesHandler.updateRecord(new AllNotesTableRecord(today, oldRecord, oldPercents, null), newRecord,newPercents);
+        mySqlNotesHandler.updateRecord(new AllNotesTableRecord(today, oldRecord, oldPercents, null), newRecord, newPercents);
     }
 
     public static void updateNotesByDay() {
