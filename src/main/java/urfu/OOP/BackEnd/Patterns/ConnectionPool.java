@@ -10,7 +10,7 @@ public class ConnectionPool {
     private static final int INITIAL_POOL_SIZE = 5;
     private static final String DATABASE_URL = "jdbc:mysql://localhost:3306/notes";
     private static final String DATABASE_USERNAME = "root";
-    private static final String DATABASE_PASSWORD = "admin";
+    private static final String DATABASE_PASSWORD = "retnirps";
 
     private final List<Connection> pool;
 
