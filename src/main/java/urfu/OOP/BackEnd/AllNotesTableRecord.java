@@ -4,6 +4,7 @@ import java.sql.Date;
 
 public class AllNotesTableRecord extends SQLRecord {
     private final java.sql.Date date;
+
     private final String record;
 
     private final double percent;
